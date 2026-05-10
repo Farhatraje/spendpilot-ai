@@ -39,7 +39,6 @@ export default function Home() {
 
   const [auditId, setAuditId] = useState("");
 
-  // LOAD DATA
   useEffect(() => {
 
     const saved = localStorage.getItem("multiTools");
@@ -50,7 +49,6 @@ export default function Home() {
 
   }, []);
 
-  // SAVE DATA
   useEffect(() => {
 
     localStorage.setItem(
@@ -60,7 +58,6 @@ export default function Home() {
 
   }, [tools]);
 
-  // HANDLE CHANGE
   const handleChange = (
     id: number,
     field: keyof ToolItem,
@@ -76,7 +73,6 @@ export default function Home() {
     setTools(updated);
   };
 
-  // ADD TOOL
   const addTool = () => {
 
     setTools([
@@ -91,17 +87,6 @@ export default function Home() {
     ]);
   };
 
-  // REMOVE TOOL
-  const removeTool = (id: number) => {
-
-    const filtered = tools.filter(
-      (item) => item.id !== id
-    );
-
-    setTools(filtered);
-  };
-
-  // GENERATE AUDIT
   const generateAudit = async () => {
 
     const auditResults: AuditResult[] = [];
@@ -218,8 +203,7 @@ export default function Home() {
 
     });
 
-    // SAVE AUDIT
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("audits")
       .insert([
         {
@@ -233,16 +217,12 @@ export default function Home() {
       .select()
       .single();
 
-    console.log(data);
-    console.log(error);
-
     if (data) {
       setAuditId(data.id);
     }
 
     setResults(auditResults);
 
-    // AI SUMMARY
     try {
 
       const response = await fetch("/api/summary", {
@@ -263,7 +243,7 @@ export default function Home() {
 
       setAiSummary(responseData.summary);
 
-    } catch (error) {
+    } catch {
 
       setAiSummary(
         "Your AI stack has optimization opportunities with potential monthly savings."
@@ -274,81 +254,118 @@ export default function Home() {
     setShowResult(true);
   };
 
-  // SAVE LEAD
-  const saveLead = async () => {
-
-    if (!email) {
-      alert("Please enter email");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("leads")
-      .insert([
-        {
-          email,
-          company,
-          role,
-          team_size: tools.length.toString(),
-        },
-      ]);
-
-    if (error) {
-
-      console.log(error);
-
-      alert("Error saving lead");
-
-    } else {
-
-      alert("Lead saved successfully!");
-
-    }
-
-  };
-
-  // TOTAL SAVINGS
   const totalSavings = results.reduce(
     (acc, item) => acc + item.savings,
     0
   );
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white overflow-hidden">
 
+      {/* BACKGROUND */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-cyan-500/20 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/20 blur-[120px]" />
+      </div>
+
+      {/* NAVBAR */}
+      <nav className="border-b border-white/10 backdrop-blur-xl sticky top-0 z-50 bg-black/40">
+
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+
+          <div className="flex items-center gap-3">
+
+            <div className="w-10 h-10 rounded-2xl bg-cyan-500 flex items-center justify-center font-bold text-black text-xl">
+              S
+            </div>
+
+            <div>
+              <h1 className="font-bold text-xl">
+                SpendPilot AI
+              </h1>
+
+              <p className="text-xs text-gray-400">
+                AI Spend Intelligence
+              </p>
+            </div>
+
+          </div>
+
+          <button className="px-5 py-2 rounded-xl bg-cyan-500 text-black font-semibold">
+            Live Audit
+          </button>
+
+        </div>
+
+      </nav>
+
+      {/* HERO */}
       <section className="px-6 py-20">
 
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
 
           {/* LEFT */}
           <div>
 
-            <div className="inline-block px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm">
-              Multi-Tool AI Audit
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 text-sm">
+              AI Cost Optimization Platform
             </div>
 
-            <h1 className="text-6xl font-bold mt-8 leading-tight">
-              Optimize Your
+            <h1 className="text-6xl lg:text-7xl font-black mt-8 leading-tight">
+
+              Optimize
               <span className="block text-cyan-400">
-                AI Stack
+                AI Spending
               </span>
+
             </h1>
+
+            <p className="text-gray-400 text-xl mt-8 leading-relaxed max-w-xl">
+              Analyze your AI stack, uncover hidden savings,
+              and generate intelligent optimization reports
+              for your entire team.
+            </p>
+
+            <div className="flex gap-4 mt-10">
+
+              <div className="p-5 rounded-3xl border border-white/10 bg-white/5 flex-1">
+                <h3 className="text-4xl font-bold text-cyan-400">
+                  40%
+                </h3>
+                <p className="text-gray-400 mt-2">
+                  Average Savings
+                </p>
+              </div>
+
+              <div className="p-5 rounded-3xl border border-white/10 bg-white/5 flex-1">
+                <h3 className="text-4xl font-bold text-purple-400">
+                  6+
+                </h3>
+                <p className="text-gray-400 mt-2">
+                  AI Platforms
+                </p>
+              </div>
+
+            </div>
 
           </div>
 
           {/* RIGHT */}
           <div className="space-y-6">
 
-            {/* FORM */}
-            <div className="p-8 rounded-3xl border border-white/10 bg-white/5">
+            <div className="p-8 rounded-[32px] border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
 
               <h2 className="text-3xl font-bold">
                 AI Stack Audit
               </h2>
 
+              <p className="text-gray-400 mt-3">
+                Analyze and optimize your AI software costs.
+              </p>
+
               <div className="mt-8 space-y-6">
 
-                {tools.map((item, index) => (
+                {tools.map((item) => (
 
                   <div
                     key={item.id}
@@ -366,7 +383,7 @@ export default function Home() {
                             e.target.value
                           )
                         }
-                        className="w-full p-4 rounded-2xl bg-black border border-white/10"
+                        className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
                       >
                         <option value="">Choose Tool</option>
                         <option>ChatGPT</option>
@@ -388,7 +405,7 @@ export default function Home() {
                             e.target.value
                           )
                         }
-                        className="w-full p-4 rounded-2xl bg-black border border-white/10"
+                        className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
                       />
 
                       <input
@@ -402,7 +419,7 @@ export default function Home() {
                             e.target.value
                           )
                         }
-                        className="w-full p-4 rounded-2xl bg-black border border-white/10"
+                        className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
                       />
 
                       <input
@@ -416,7 +433,7 @@ export default function Home() {
                             e.target.value
                           )
                         }
-                        className="w-full p-4 rounded-2xl bg-black border border-white/10"
+                        className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
                       />
 
                     </div>
@@ -429,14 +446,14 @@ export default function Home() {
 
                   <button
                     onClick={addTool}
-                    className="flex-1 py-4 rounded-2xl border border-white/10"
+                    className="flex-1 py-4 rounded-2xl border border-white/10 hover:bg-white/5 transition"
                   >
                     Add Tool
                   </button>
 
                   <button
                     onClick={generateAudit}
-                    className="flex-1 py-4 rounded-2xl bg-cyan-500"
+                    className="flex-1 py-4 rounded-2xl bg-cyan-500 text-black font-bold hover:scale-[1.02] transition"
                   >
                     Generate Audit
                   </button>
@@ -452,20 +469,18 @@ export default function Home() {
 
               <div className="space-y-6">
 
-                {/* HERO */}
                 <div className="p-8 rounded-3xl border border-cyan-500/20 bg-cyan-500/10">
 
-                  <h2 className="text-6xl font-bold">
+                  <h2 className="text-6xl font-black">
                     ${totalSavings}/mo
                   </h2>
 
-                  <p className="text-gray-300 mt-3">
+                  <p className="text-gray-300 mt-3 text-lg">
                     Potential Monthly Savings
                   </p>
 
                 </div>
 
-                {/* SHARE URL */}
                 {auditId && (
 
                   <div className="p-8 rounded-3xl border border-green-500/20 bg-green-500/10">
@@ -478,19 +493,19 @@ export default function Home() {
 
                       <input
                         readOnly
-                        value={`http://localhost:3000/audit/${auditId}`}
+                        value={`https://spendpilot-ai-two.vercel.app/audit/${auditId}`}
                         className="flex-1 p-4 rounded-2xl bg-black border border-white/10"
                       />
 
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(
-                            `http://localhost:3000/audit/${auditId}`
+                            `https://spendpilot-ai-two.vercel.app/audit/${auditId}`
                           );
 
                           alert("Copied!");
                         }}
-                        className="px-6 rounded-2xl bg-cyan-500"
+                        className="px-6 rounded-2xl bg-cyan-500 text-black font-bold"
                       >
                         Copy
                       </button>
@@ -501,14 +516,13 @@ export default function Home() {
 
                 )}
 
-                {/* AI SUMMARY */}
                 <div className="p-8 rounded-3xl border border-purple-500/20 bg-purple-500/10">
 
                   <h3 className="text-2xl font-bold">
                     AI Summary
                   </h3>
 
-                  <p className="text-gray-300 mt-4">
+                  <p className="text-gray-300 mt-4 leading-relaxed">
                     {aiSummary}
                   </p>
 
@@ -523,6 +537,35 @@ export default function Home() {
         </div>
 
       </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 py-10 px-6 mt-20">
+
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+
+          <div>
+
+            <h2 className="text-2xl font-bold">
+              SpendPilot AI
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              AI Spend Intelligence Platform
+            </p>
+
+          </div>
+
+          <div className="flex items-center gap-6 text-gray-400">
+
+            <p>Next.js</p>
+            <p>Supabase</p>
+            <p>OpenAI</p>
+
+          </div>
+
+        </div>
+
+      </footer>
 
     </main>
   );
