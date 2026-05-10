@@ -537,7 +537,83 @@ export default function Home() {
         </div>
 
       </section>
+{/* LEAD CAPTURE */}
+<div className="p-8 rounded-3xl border border-cyan-500/20 bg-cyan-500/10">
 
+  <h3 className="text-2xl font-bold">
+    Save Full Audit Report
+  </h3>
+
+  <p className="text-gray-300 mt-3">
+    Get your AI savings report delivered to your email.
+  </p>
+
+  <div className="mt-8 space-y-4">
+
+    <input
+      type="email"
+      placeholder="Email Address"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
+    />
+
+    <input
+      type="text"
+      placeholder="Company Name"
+      value={company}
+      onChange={(e) => setCompany(e.target.value)}
+      className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
+    />
+
+    <input
+      type="text"
+      placeholder="Your Role"
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      className="w-full p-4 rounded-2xl bg-black border border-white/10 outline-none"
+    />
+
+    <button
+      onClick={async () => {
+
+        if (!email) {
+          alert("Please enter email");
+          return;
+        }
+
+        const { error } = await supabase
+          .from("leads")
+          .insert([
+            {
+              email,
+              company,
+              role,
+              team_size: tools.length.toString(),
+            },
+          ]);
+
+        if (error) {
+
+          console.log(error);
+
+          alert("Error saving lead");
+
+        } else {
+
+          alert("Lead saved successfully!");
+
+        }
+
+      }}
+      className="w-full py-4 rounded-2xl bg-cyan-500 text-black font-bold hover:scale-[1.02] transition"
+    >
+      Save Audit Report
+    </button>
+
+  </div>
+
+</div>
       {/* FOOTER */}
       <footer className="border-t border-white/10 py-10 px-6 mt-20">
 
